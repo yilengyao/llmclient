@@ -35,6 +35,8 @@
     "prepublishOnly": "npm run verify"
   },
   "devDependencies": {
+    "@types/node": "^22.15.2",
+    "openai": "^4.96.0",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
@@ -42,5 +44,8 @@
   },
   "engines": {
     "node": "^20.0.0 || >=22.0.0"
+  },
+  "dependencies": {
+    "path": "^0.12.7"
   }
 }
