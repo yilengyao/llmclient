@@ -1,4 +1,3 @@
-import OpenAI from "openai";
 import { LlmClient } from "@/client/llm_client";
 import { 
     OllamaConfiguration, 
@@ -7,19 +6,24 @@ import {
 } from "@/configuration/llm-configurations";
 
 class OpenAIClient implements LlmClient {
-    private client: OpenAI;
     private model: string | null = null;
     private models: string[] | null = null;
     private provider: LlmProvider;
+    private apiKey: string;
+    private baseUrl: string = 'https://api.openai.com';
 
     constructor( 
         configuration: OllamaConfiguration | OpenAIConfiguration,
     ) {
-        this.client = new OpenAI(configuration);
         if (!configuration.provider) {
             throw new Error("Provider is required in configuration");
         }
         this.provider = configuration.provider;
+        if (this.provider === LlmProvider.OLLAMA) {
+            const ollamaConfig = configuration as OllamaConfiguration;
+            this.baseUrl = ollamaConfig.baseURL || 'http://localhost:11434';
+        }
+        this.apiKey = configuration.apiKey || '';
     }
 
     getProvider(): LlmProvider {
@@ -28,8 +32,21 @@ class OpenAIClient implements LlmClient {
 
     async getModels(): Promise<string[]> {
         try {
-            const response = await this.client.models.list();
-            return response.data.map((model) => model.id)
+            const response = await fetch(`${this.baseUrl}/v1/models`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.data.map((model: any) => model.id);
+            
         } catch (error) {
             console.error('Error fetching models:', error);
             throw error;
@@ -48,35 +65,35 @@ class OpenAIClient implements LlmClient {
         this.model = model;
     }
 
-    async createCompletion(
-        prompt: string
-    ): Promise<{
-        role: string;
-        content: string;
-    }> {
-        if (!this.model) {
-            throw new Error("Model not set. Call setModel first.");
-        }
-        try {
-            const response = await this.client.chat.completions.create({
-                model: this.model,
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                stream: false
-            });
-            return {
-                role: response.choices[0].message.role,
-                content: response.choices[0].message.content || ''
-            };
-        } catch (error) {
-            console.error('Error creating completion:', error);
-            throw error;
-        }
-    }
+//     async createCompletion(
+//         prompt: string
+//     ): Promise<{
+//         role: string;
+//         content: string;
+//     }> {
+//         if (!this.model) {
+//             throw new Error("Model not set. Call setModel first.");
+//         }
+//         try {
+//             const response = await this.client.chat.completions.create({
+//                 model: this.model,
+//                 messages: [
+//                     {
+//                         role: 'user',
+//                         content: prompt
+//                     }
+//                 ],
+//                 stream: false
+//             });
+//             return {
+//                 role: response.choices[0].message.role,
+//                 content: response.choices[0].message.content || ''
+//             };
+//         } catch (error) {
+//             console.error('Error creating completion:', error);
+//             throw error;
+//         }
+//     }
 }
 
 export default OpenAIClient;

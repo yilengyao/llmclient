@@ -9,10 +9,18 @@ import OpenAIClient from "@/client/openai_client";
 
 let llmClient: LlmClient | null = null;
 
+/**
+ * @description Retrieves the available LLM providers
+ * @returns {LlmProvider[]} - An array of available LLM providers
+ */
 const getLlmProviders = (): LlmProvider[] => {
     return Object.values(LlmProvider);
 };
 
+/**
+ * @description Retrieves the current LLM provider
+ * @returns {LlmProvider | null} - The current LLM provider or null if not set
+ */
 const getLlmProvider = (): LlmProvider | null => {
     if (!llmClient) {
         return null;
@@ -20,6 +28,12 @@ const getLlmProvider = (): LlmProvider | null => {
     return llmClient.getProvider();
 };
 
+/**
+ * @description Private method that validates the LLM configuration object
+ * @param configuration - LLM configuration object
+ * @returns {void}
+ * @throws Will throw an error if the configuration is invalid
+ */
 const validateConfiguration = (configuration: LlmConfiguration): void => {
     // Check if provider exists first
     if (!configuration.provider) {
@@ -44,7 +58,17 @@ const validateConfiguration = (configuration: LlmConfiguration): void => {
     }
 };
 
+/**
+ * @description Creates an LLM client based on the provided configuration
+ * @param configuration - LLM configuration object
+ * @throws Will throw an error if the configuration is invalid or if the client cannot be created
+ * @returns {Promise<void>} - A promise that resolves when the client is created
+ */
 const createLlmClient = async (configuration: LlmConfiguration) => {
+    // Validate the configuration before creating the client
+    validateConfiguration(configuration);
+
+    // Create the LLM client based on the provider
     switch (configuration.provider) {
         case LlmProvider.OLLAMA:
         case LlmProvider.OPENAI:
@@ -67,6 +91,22 @@ const createLlmClient = async (configuration: LlmConfiguration) => {
     }
 };
 
+/**
+ * @description Clears the cached LLM client instance
+ * This is useful for logout flows or when switching configurations
+ * @param {void}
+ * @returns {void}
+ * @throws {void}
+ */
+const clearLlmClient = (): void => {
+    llmClient = null;
+};
+
+/**
+ * @description Retrieves the available models for the current LLM client
+ * @returns {Promise<string[]>} - A promise that resolves to an array of model names
+ * @throws Will throw an error if the client is not initialized or if fetching models fails
+ */
 const getModels = async (): Promise<string[]> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
@@ -82,21 +122,22 @@ const setModel = async (model: string): Promise<void> => {
 }
 
 
-const createCompletion = async (prompt: string): Promise<{
-    role: string;
-    content: string;
-}> => {
-    if (!llmClient) {
-        throw new Error("LLM client not initialized. Call createLlmClient first.");
-    }
-    return await llmClient.createCompletion(prompt);
-};
+// const createCompletion = async (prompt: string): Promise<{
+//     role: string;
+//     content: string;
+// }> => {
+//     if (!llmClient) {
+//         throw new Error("LLM client not initialized. Call createLlmClient first.");
+//     }
+//     return await llmClient.createCompletion(prompt);
+// };
 
 export {
     getLlmProviders,
     getLlmProvider,
     createLlmClient,
+    clearLlmClient,
     getModels,
     setModel,
-    createCompletion
+    // createCompletion
 };

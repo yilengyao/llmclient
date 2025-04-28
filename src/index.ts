@@ -1,20 +1,33 @@
 import { add } from './add';
 import { subtract } from './subtract';
-import {  getLlmProviders,
+import {
+    LlmProvider,
+    OllamaConfiguration,
+    OpenAIConfiguration,
+    LlmConfiguration
+} from '@/configuration/llm-configurations'
+import {  
+    getLlmProviders,
     getLlmProvider,
     createLlmClient,
+    clearLlmClient,
     getModels,
     setModel,
-    createCompletion
+    // createCompletion
 } from '@/api/llm';
 
 export { 
     add, 
     subtract,
+    LlmProvider,
+    OllamaConfiguration,
+    OpenAIConfiguration,
+    LlmConfiguration,
     getLlmProviders,
     getLlmProvider,
     createLlmClient,
+    clearLlmClient,
     getModels,
     setModel,
-    createCompletion
+    // createCompletion
 };
