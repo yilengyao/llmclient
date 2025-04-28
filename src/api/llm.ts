@@ -75,6 +75,7 @@ const createLlmClient = async (configuration: LlmConfiguration) => {
             llmClient = new OpenAIClient(configuration);
             break;
         default:
+            llmClient = null;
             throw new Error(`Unsupported LLM provider: ${configuration.provider}`);
     }
 
@@ -83,10 +84,12 @@ const createLlmClient = async (configuration: LlmConfiguration) => {
         const models = await llmClient.getModels();
         
         if (!models || models.length === 0) {
-            throw new Error(`No models found for ${llmClient.getProvider()}`);
+            llmClient = null;
+            throw new Error(`No models found for ${configuration.provider}`);
         }
     } catch (error: any) {
         // Handle API errors gracefully
+        llmClient = null;
         throw new Error(`Failed to fetch models: ${error.message}`);
     }
 };
