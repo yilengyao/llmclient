@@ -46,4 +46,15 @@ The project has the following files and directories:
 - `npm run build`: Compiles `src` into CommonJS and ES modules (along with TypeScript declaration files) into the `dist` directory
 - `npm run verify`: Run typechecks + tests + build. Suitable when developing and in CI environments to ensure all checks are valid
 - `npm run clean`: Deletes the `dist` directory
-# create-ts-fast-template
+
+# Local development
+In current repo(llmclient) run
+```
+npm run build
+npm pack
+```
+
+In consuming repo run to consume the tar package
+```
+npm install {relative path}/llmclient/innobridge-llmclient-0.0.0.tgz
+```
