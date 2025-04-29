@@ -1,5 +1,3 @@
-import { add } from './add';
-import { subtract } from './subtract';
 import {
     LlmProvider,
     OllamaConfiguration,
@@ -18,8 +16,6 @@ import {
 } from '@/api/llm';
 
 export { 
-    add, 
-    subtract,
     LlmProvider,
     OllamaConfiguration,
     OpenAIConfiguration,
