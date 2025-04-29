@@ -12,6 +12,7 @@ import {
     createLlmClient,
     clearLlmClient,
     getModels,
+    getModel,
     setModel,
     // createCompletion
 } from '@/api/llm';
@@ -28,6 +29,7 @@ export {
     createLlmClient,
     clearLlmClient,
     getModels,
+    getModel,
     setModel,
     // createCompletion
 };
