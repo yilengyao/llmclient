@@ -6,6 +6,7 @@ import {
     OpenAIConfiguration
 } from "@/configuration/llm-configurations";
 import OpenAIClient from "@/client/openai_client";
+import { Model } from "@/models/models";
 
 let llmClient: LlmClient | null = null;
 
@@ -81,7 +82,7 @@ const createLlmClient = async (configuration: LlmConfiguration) => {
 
     try {
         // Direct call is fine here since we just created the client
-        const models = await llmClient.getModels();
+        const models = (await llmClient.getModels()).data;
         
         if (!models || models.length === 0) {
             llmClient = null;
@@ -110,21 +111,21 @@ const clearLlmClient = (): void => {
  * @returns {Promise<string[]>} - A promise that resolves to an array of model names
  * @throws Will throw an error if the client is not initialized or if fetching models fails
  */
-const getModels = async (): Promise<string[]> => {
+const getModels = async (): Promise<Model[]> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
     }
-    return await llmClient.getModels();
+    return (await llmClient.getModels()).data;
 };
 
-const getModel = (): string | null => {
+const getModel = (): Model | null => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
     }
     return llmClient.getModel();
 }
 
-const setModel = async (model: string): Promise<void> => {
+const setModel = async (model: Model): Promise<void> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
     }

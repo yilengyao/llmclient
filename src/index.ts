@@ -14,12 +14,14 @@ import {
     setModel,
     // createCompletion
 } from '@/api/llm';
+import { Model } from '@/models/models';
 
 export { 
     LlmProvider,
     OllamaConfiguration,
     OpenAIConfiguration,
     LlmConfiguration,
+    Model,
     getLlmProviders,
     getLlmProvider,
     createLlmClient,

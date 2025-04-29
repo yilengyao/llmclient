@@ -4,10 +4,11 @@ import {
     OpenAIConfiguration,
     LlmProvider
 } from "@/configuration/llm-configurations";
+import { Model, Models } from "@/models/models";
 
 class OpenAIClient implements LlmClient {
-    private model: string | null = null;
-    private models: string[] | null = null;
+    private model: Model | null = null;
+    private models: Model[] | null = null;
     private provider: LlmProvider;
     private apiKey: string;
     private baseUrl: string = 'https://api.openai.com';
@@ -30,7 +31,7 @@ class OpenAIClient implements LlmClient {
         return this.provider;
     }
 
-    async getModels(): Promise<string[]> {
+    async getModels(): Promise<Models> {
         try {
             const response = await fetch(`${this.baseUrl}/v1/models`, {
                 method: 'GET',
@@ -45,7 +46,7 @@ class OpenAIClient implements LlmClient {
             }
             
             const data = await response.json();
-            return data.data.map((model: any) => model.id);
+            return data as Models;
             
         } catch (error) {
             console.error('Error fetching models:', error);
@@ -53,12 +54,11 @@ class OpenAIClient implements LlmClient {
         }
     }
 
-    getModel(): string | null {
+    getModel(): Model | null {
         return this.model;
     }
 
-    async setModel(model: string) {
-        this.models = await this.getModels();
+    async setModel(model: Model): Promise<void> {
         if (!this.models?.includes(model)) {
             throw new Error(`Model ${model} not found`);
         }
