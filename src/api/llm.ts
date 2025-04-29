@@ -117,6 +117,13 @@ const getModels = async (): Promise<string[]> => {
     return await llmClient.getModels();
 };
 
+const getModel = (): string | null => {
+    if (!llmClient) {
+        throw new Error("LLM client not initialized. Call createLlmClient first.");
+    }
+    return llmClient.getModel();
+}
+
 const setModel = async (model: string): Promise<void> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
@@ -141,6 +148,7 @@ export {
     createLlmClient,
     clearLlmClient,
     getModels,
+    getModel,
     setModel,
     // createCompletion
 };
