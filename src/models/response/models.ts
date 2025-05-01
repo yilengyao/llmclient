@@ -1,3 +1,5 @@
+import { ResponseObject } from "@/models/enums";
+
 interface Model {
     /**
      * The model identifier, which can be referenced in the API endpoints.
@@ -7,17 +9,17 @@ interface Model {
     /**
      * The Unix timestamp (in seconds) when the model was created.
      */
-    created: number;
+    created?: number;
 
     /**
      * The object type, which is always "model".
      */
-    object: 'model';
+    object?: ResponseObject.MODEL;
 
     /**
      * The organization that owns the model.
      */
-    owned_by: string;
+    owned_by?: string;
 }
 
 /**
@@ -32,7 +34,7 @@ interface Models {
     /**
      * The object type, which is always "list"
      */
-    object: 'list';
+    object: ResponseObject.LIST;
 }
 
 export {

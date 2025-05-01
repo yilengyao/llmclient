@@ -4,9 +4,11 @@ import {
     LlmConfiguration,
     OllamaConfiguration,
     OpenAIConfiguration
-} from "@/configuration/llm-configurations";
+} from "@/configuration/llm_configurations";
 import OpenAIClient from "@/client/openai_client";
-import { Model } from "@/models/models";
+import { Model, Models } from "@/models/response/models";
+import { ChatCompletion } from "@/models/response/chat_completion";
+import { ChatRequest } from "@/models/request/chat_request";
 
 let llmClient: LlmClient | null = null;
 
@@ -111,13 +113,29 @@ const clearLlmClient = (): void => {
  * @returns {Promise<string[]>} - A promise that resolves to an array of model names
  * @throws Will throw an error if the client is not initialized or if fetching models fails
  */
-const getModels = async (): Promise<Model[]> => {
+const getModels = async (): Promise<Models> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
     }
-    return (await llmClient.getModels()).data;
+    return (await llmClient.getModels());
 };
+/**
+ * @description Retrieves the cached models from the LLM client
+ * @returns {Model[] | null} - An array of cached models or null if not set
+ * @throws Will throw an error if the client is not initialized 
+*/
+const getCachedModels = (): Model[] | null => {
+    if (!llmClient) {
+        throw new Error("LLM client not initialized. Call createLlmClient first.");
+    }
+    return llmClient.getCachedModels();
+}
 
+/**
+ * @description Retrieves the current model from the LLM client
+ * @returns {Model | null} - The current model or null if not set
+ * @throws Will throw an error if the client is not initialized 
+*/
 const getModel = (): Model | null => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
@@ -125,23 +143,55 @@ const getModel = (): Model | null => {
     return llmClient.getModel();
 }
 
+/**
+ * @description Sets the current model in the LLM client
+ * @param {Model} model - The model to set
+ * @returns {Promise<void>} - A promise that resolves when the model is set
+ * @throws Will throw an error if the client is not initialized or if the model is not found
+ */
 const setModel = async (model: Model): Promise<void> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
+    };
+
+    let models = getCachedModels() ?? [];
+    for (const cachedModel of models) {
+        if (cachedModel.id === model.id) {
+            llmClient.setModel(cachedModel);
+            return;
+        }
     }
-    await llmClient.setModel(model);
-}
+
+    // If the model is not found in the cache, fetch models again
+    await getModels();
+    models = getCachedModels() ?? [];
+ 
+    for (const cachedModel of models) {
+        if (cachedModel.id === model.id) {
+            llmClient.setModel(cachedModel);
+            return;
+        }
+    }
+    throw new Error(`Model ${model.id} not found`);
+};
 
 
-// const createCompletion = async (prompt: string): Promise<{
-//     role: string;
-//     content: string;
-// }> => {
-//     if (!llmClient) {
-//         throw new Error("LLM client not initialized. Call createLlmClient first.");
-//     }
-//     return await llmClient.createCompletion(prompt);
-// };
+const createCompletion = async (request: ChatRequest): Promise<ChatCompletion> => {
+    if (!llmClient) {
+        throw new Error("LLM client not initialized. Call createLlmClient first.");
+    }
+
+    // If the caller didn't supply a model, use the one already set in the client
+    if (!request.model) {
+        const current = getModel();
+        if (!current) {
+        throw new Error("No model set. Please set the model before calling createCompletion.");
+        }
+        request.model = current.id;
+    }
+
+    return llmClient.createCompletion(request);
+};
 
 export {
     getLlmProviders,
@@ -149,7 +199,8 @@ export {
     createLlmClient,
     clearLlmClient,
     getModels,
+    getCachedModels,
     getModel,
     setModel,
-    // createCompletion
+    createCompletion
 };
