@@ -32,7 +32,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc",
     "verify": "npm run typecheck && npm run test && npm run build",
-    "prepublishOnly": "npm run verify"
+    "prepublishOnly": "npm run verify",
+    "test:integration": "npx tsx src/__tests__/integration/${npm_config_file:-*.test.ts}"
   },
   "devDependencies": {
     "@types/node": "^22.15.2",

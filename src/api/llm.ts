@@ -4,9 +4,9 @@ import {
     LlmConfiguration,
     OllamaConfiguration,
     OpenAIConfiguration
-} from "@/configuration/llm-configurations";
+} from "@/configuration/llm_configurations";
 import OpenAIClient from "@/client/openai_client";
-import { Model } from "@/models/models";
+import { Model, Models } from "@/models/response/models";
 
 let llmClient: LlmClient | null = null;
 
@@ -111,11 +111,11 @@ const clearLlmClient = (): void => {
  * @returns {Promise<string[]>} - A promise that resolves to an array of model names
  * @throws Will throw an error if the client is not initialized or if fetching models fails
  */
-const getModels = async (): Promise<Model[]> => {
+const getModels = async (): Promise<Models> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
     }
-    return (await llmClient.getModels()).data;
+    return (await llmClient.getModels());
 };
 
 const getModel = (): Model | null => {
