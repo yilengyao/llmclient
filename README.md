@@ -58,3 +58,24 @@ In consuming repo run to consume the tar package
 ```
 npm install {relative path}/llmclient/innobridge-llmclient-0.0.0.tgz
 ```
+
+## Integration test
+To run integration test, put your integration test file in the `integration` folder
+```
+src
+├── __tests__
+│   ├── dummy.test.ts
+│   └── integration
+│       ├── llm_api.test.ts
+│       └── ollama_client.test.ts
+```
+
+and run 
+```bash
+npm run test:integration --file=<file-name>
+```
+
+eg
+```bash
+npm run test:integration --file=llm_api.test.ts
+```
