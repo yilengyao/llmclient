@@ -69,9 +69,7 @@ class OpenAIClient implements LlmClient {
         this.model = model;
     }
 
-
     async createCompletion(request: ChatRequest): Promise<ChatCompletion> {
-        console.log("request", request);
         if (!request.model) {
             throw new Error("Model not set. Call setModel first.");
         }
@@ -84,8 +82,6 @@ class OpenAIClient implements LlmClient {
                 },
                 body: JSON.stringify(request)
             });
-
-            console.log("response", response);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -98,7 +94,6 @@ class OpenAIClient implements LlmClient {
             throw error;
         }
     }
-
 }
 
 export default OpenAIClient;
