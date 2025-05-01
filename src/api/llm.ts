@@ -9,7 +9,6 @@ import OpenAIClient from "@/client/openai_client";
 import { Model, Models } from "@/models/response/models";
 import { ChatCompletion } from "@/models/response/chat_completion";
 import { ChatRequest } from "@/models/request/chat_request";
-import { get } from "http";
 
 let llmClient: LlmClient | null = null;
 

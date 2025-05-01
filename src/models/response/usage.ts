@@ -15,7 +15,7 @@ interface CompletionTokensDetails {
     accepted_prediction_tokens: number;
     audio_tokens: number;
     reasoning_tokens: number;
-    rejected_prediection_tokens: number;
+    rejected_prediction_tokens: number;
 }
 
 interface PromptTokensDetails {

@@ -6,7 +6,6 @@ import {
 } from "@/configuration/llm_configurations";
 import { Model, Models } from "@/models/response/models";
 import { ChatRequest } from "@/models/request/chat_request";
-import { get } from "http";
 import { ChatCompletion } from "@/models/response/chat_completion";
 
 class OpenAIClient implements LlmClient {
