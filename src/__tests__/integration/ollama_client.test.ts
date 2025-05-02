@@ -4,7 +4,7 @@ import { LlmProvider, OllamaConfiguration } from '@/configuration/llm_configurat
 import { Role, ResponseObject } from '@/models/enums';
 import { Model } from '@/models/response/models';
 
-const initializeClient = ():LlmClient => {
+const initializeClient = (): LlmClient => {
   try {
     const configuration: OllamaConfiguration =  {
       provider: LlmProvider.OLLAMA,

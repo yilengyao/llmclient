@@ -12,6 +12,8 @@ import * as responseMessage from '@/models/response/message';
 import * as toolCall from '@/models/response/tool_call';
 import * as usage from '@/models/response/usage';
 import * as enums from '@/models/enums';
+import * as generateImageRequest from '@/models/request/generate_image_request';
+import * as imageResponse from '@/models/response/image_response';
 
 export { 
     configuration,
@@ -27,5 +29,7 @@ export {
     responseMessage,
     toolCall,
     usage,
-    enums
+    enums,
+    generateImageRequest,
+    imageResponse
 };

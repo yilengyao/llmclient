@@ -9,6 +9,8 @@ import OpenAIClient from "@/client/openai_client";
 import { Model, Models } from "@/models/response/models";
 import { ChatCompletion } from "@/models/response/chat_completion";
 import { ChatRequest } from "@/models/request/chat_request";
+import { GenerateImageRequest } from "@/models/request/generate_image_request";
+import { ImageResponse } from "@/models/response/image_response";
 
 let llmClient: LlmClient | null = null;
 
@@ -193,6 +195,22 @@ const createCompletion = async (request: ChatRequest): Promise<ChatCompletion> =
     return llmClient.createCompletion(request);
 };
 
+const generateImage = async (request: GenerateImageRequest): Promise<ImageResponse> => {
+    if (!llmClient) {
+        throw new Error("LLM client not initialized. Call createLlmClient first.");
+    }
+
+    if (!request.model) {
+        const current = getModel();
+        if (!current) {
+        throw new Error("No model set. Please set the model before calling createCompletion.");
+        }
+        request.model = current.id;
+    }
+
+    return llmClient.generateImage(request);
+}
+
 export {
     getLlmProviders,
     getLlmProvider,
@@ -202,5 +220,6 @@ export {
     getCachedModels,
     getModel,
     setModel,
-    createCompletion
+    createCompletion,
+    generateImage
 };
