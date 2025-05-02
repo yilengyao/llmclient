@@ -3,7 +3,8 @@ enum Role {
     SYSTEM = 'system',
     USER = 'user',
     ASSISTANT = 'assistant',
-    TOOL = 'tool'
+    TOOL = 'tool',
+    BOT = 'bot',
 };
 
 enum ReasoningEffort {

@@ -11,7 +11,8 @@ type Message =
     | SystemMessage 
     | UserMessage 
     | AssistantMessage 
-    | ToolMessage;
+    | ToolMessage
+    | BotMessage;
 
 interface DeveloperMessage {
     content: string | Array<TextContent>;
@@ -43,6 +44,12 @@ interface ToolMessage {
     role: Role.TOOL;
     content: string | Array<TextContent>;
     tool_call_id: string;
+};
+
+interface BotMessage {
+    role: Role.BOT;
+    content: string | Array<TextContent>;
+    name?: string;
 };
 
 interface Audio {
