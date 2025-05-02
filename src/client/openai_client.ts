@@ -94,6 +94,12 @@ class OpenAIClient implements LlmClient {
         }
     }
 
+   /**
+     * Generates an image based on the provided request.
+     * 
+     * Note: This method currently supports only the OPENAI provider.
+     * If the provider is not OPENAI, an error will be thrown.
+     */
     async generateImage(request: GenerateImageRequest): Promise<ImageResponse> {
         if (this.provider !== LlmProvider.OPENAI) {
             throw new Error(`${this.provider} is the only provider that supports image generation.`);

@@ -195,6 +195,12 @@ const createCompletion = async (request: ChatRequest): Promise<ChatCompletion> =
     return llmClient.createCompletion(request);
 };
 
+/**
+ * Generates an image based on the provided request.
+ * Note: This method currently supports only the OPENAI provider.
+ * If the provider is not OPENAI, an error will be thrown.
+ * 
+ */
 const generateImage = async (request: GenerateImageRequest): Promise<ImageResponse> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
