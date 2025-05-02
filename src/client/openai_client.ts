@@ -50,8 +50,8 @@ class OpenAIClient implements LlmClient {
             });
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+                const errJson = await response.json();
+                throw new Error(`HTTP error! status: ${errJson.error.message}`);            }
             
             const data = await response.json();
             this.models = data.data;
@@ -71,9 +71,6 @@ class OpenAIClient implements LlmClient {
     }
 
     async createCompletion(request: ChatRequest): Promise<ChatCompletion> {
-        if (!request.model) {
-            throw new Error("Model not set. Call setModel first.");
-        }
         try {
             const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
                 method: 'POST',
@@ -85,7 +82,8 @@ class OpenAIClient implements LlmClient {
             });
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errJson = await response.json();
+                throw new Error(`HTTP error! status: ${errJson.error.message}`);
             }
             
             const data = await response.json();
@@ -96,14 +94,15 @@ class OpenAIClient implements LlmClient {
         }
     }
 
-    /**
+   /**
+     * Generates an image based on the provided request.
      * 
-     * Not tested and released 
-     * 
+     * Note: This method currently supports only the OPENAI provider.
+     * If the provider is not OPENAI, an error will be thrown.
      */
     async generateImage(request: GenerateImageRequest): Promise<ImageResponse> {
-        if (!request.model) {
-            throw new Error("Model not set. Call setModel first.");
+        if (this.provider !== LlmProvider.OPENAI) {
+            throw new Error(`${this.provider} is the only provider that supports image generation.`);
         }
         try {
             const response = await fetch(`${this.baseUrl}/v1/images/generations`, {
@@ -116,13 +115,14 @@ class OpenAIClient implements LlmClient {
             });
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errJson = await response.json();
+                throw new Error(`HTTP error! status: ${errJson.error.message}`);
             }
             
             const data = await response.json();
             return data as ImageResponse;
-        } catch (error) {
-            console.error('Error generating image:', error);
+        } catch (error: any) {
+            console.error('Error generating image:', error.message);
             throw error;
         }
     };

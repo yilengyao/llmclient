@@ -15,8 +15,6 @@ import {
 } from "@/configuration/llm_configurations";
 import { Role } from "@/models/enums";
 import { ChatRequest } from "@/models/request/chat_request";
-import { clear } from "console";
-import { g } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 const initializeLlmClient = async () => {
     const configuration: OllamaConfiguration =  {
