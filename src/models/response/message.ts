@@ -1,5 +1,4 @@
 import { ToolCall } from "@/models/response/tool_call";
-import { Tool } from "../request/tool";
 
 interface Message {
     role: string;
