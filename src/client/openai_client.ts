@@ -7,6 +7,8 @@ import {
 import { Model, Models } from "@/models/response/models";
 import { ChatRequest } from "@/models/request/chat_request";
 import { ChatCompletion } from "@/models/response/chat_completion";
+import { GenerateImageRequest } from "@/models/request/generate_image_request";
+import { ImageResponse } from "@/models/response/image_response";
 
 class OpenAIClient implements LlmClient {
     private model: Model | null = null;
@@ -93,6 +95,38 @@ class OpenAIClient implements LlmClient {
             throw error;
         }
     }
+
+    /**
+     * 
+     * Not tested and released 
+     * 
+     */
+    async generateImage(request: GenerateImageRequest): Promise<ImageResponse> {
+        if (!request.model) {
+            throw new Error("Model not set. Call setModel first.");
+        }
+        try {
+            const response = await fetch(`${this.baseUrl}/v1/images/generations`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data as ImageResponse;
+        } catch (error) {
+            console.error('Error generating image:', error);
+            throw error;
+        }
+    };
+
 }
 
 export default OpenAIClient;
