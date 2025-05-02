@@ -203,7 +203,7 @@ const generateImage = async (request: GenerateImageRequest): Promise<ImageRespon
     if (!request.model) {
         const current = getModel();
         if (!current) {
-        throw new Error("No model set. Please set the model before calling createCompletion.");
+        throw new Error("No model set. Please set the model before calling generateImage.");
         }
         request.model = current.id;
     }
