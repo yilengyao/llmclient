@@ -117,7 +117,7 @@ enum ImageSize {
 };
 
 enum ImageBackground {
-    TRANSPARANT = 'transparent',
+    TRANSPARENT = 'transparent',
     OPAQUE = 'opaque',
     AUTO = 'auto'
 };
