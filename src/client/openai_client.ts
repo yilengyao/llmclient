@@ -96,6 +96,11 @@ class OpenAIClient implements LlmClient {
         }
     }
 
+    /**
+     * 
+     * Not tested and released 
+     * 
+     */
     async generateImage(request: GenerateImageRequest): Promise<ImageResponse> {
         if (!request.model) {
             throw new Error("Model not set. Call setModel first.");
@@ -121,7 +126,7 @@ class OpenAIClient implements LlmClient {
             throw error;
         }
     };
-    
+
 }
 
 export default OpenAIClient;
