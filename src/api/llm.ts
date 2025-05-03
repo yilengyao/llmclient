@@ -178,7 +178,7 @@ const setModel = async (model: Model): Promise<void> => {
 };
 
 
-const createCompletion = async (request: ChatRequest): Promise<ChatCompletion> => {
+const createCompletion = async (request: ChatRequest, chatListener?: (completions: Array<ChatCompletion>) => void): Promise<ChatCompletion> => {
     if (!llmClient) {
         throw new Error("LLM client not initialized. Call createLlmClient first.");
     }
@@ -192,7 +192,7 @@ const createCompletion = async (request: ChatRequest): Promise<ChatCompletion> =
         request.model = current.id;
     }
 
-    return llmClient.createCompletion(request);
+    return llmClient.createCompletion(request, chatListener);
 };
 
 /**

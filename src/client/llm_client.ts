@@ -11,6 +11,6 @@ export interface LlmClient {
     getModels(): Promise<Models>;
     getModel(): Model | null;
     setModel(model: Model): void;
-    createCompletion(request: ChatRequest): Promise<ChatCompletion>;
+    createCompletion(request: ChatRequest, chatListener?: (completions: Array<ChatCompletion>) => void): Promise<ChatCompletion>;
     generateImage(request: GenerateImageRequest): Promise<ImageResponse>;
 }

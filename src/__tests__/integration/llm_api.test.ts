@@ -15,6 +15,7 @@ import {
 } from "@/configuration/llm_configurations";
 import { Role } from "@/models/enums";
 import { ChatRequest } from "@/models/request/chat_request";
+import { CompletionMessage, ChatCompletion, CompletionChunk } from "@/models/response/chat_completion";
 
 const initializeLlmClient = async () => {
     const configuration: OllamaConfiguration =  {
@@ -165,7 +166,7 @@ const createCompletionTest = async () => {
     request.model = 'qwen3:8b';
     let response = await createCompletion(request);
     if (response.model === request.model) {
-        console.log(`response with ${request.model}: ${response.choices[0].message.content}`);
+        console.log(`response with ${request.model}: ${(response.choices[0] as CompletionMessage).message.content}`);
     } else {
         throw new Error(`Expected model to be ${request.model} but got ${response.model}`);
     }
@@ -182,7 +183,7 @@ const createCompletionTest = async () => {
     setModel({ id: 'qwen2.5-coder:7b' });
     response = await createCompletion(request);
     if (response.model === getModel()?.id) {
-        console.log(`response with ${getModel()?.id}}: ${response.choices[0].message.content}`);
+        console.log(`response with ${getModel()?.id}}: ${(response.choices[0] as CompletionMessage).message.content}`);
     } else {
         throw new Error(`Expected model to be ${getModel()?.id} but got ${response.model}`);
     }
@@ -191,12 +192,44 @@ const createCompletionTest = async () => {
     request.model = 'qwen3:8b';
     response = await createCompletion(request);
     if (response.model === request.model) {
-        console.log(`response with ${request.model}: ${response.choices[0].message.content}`);
+        console.log(`response with ${request.model}: ${(response.choices[0] as CompletionMessage).message.content}`);
     } else {
         throw new Error(`Expected model to be ${request.model} but got ${response.model}`);
     }
 
     console.log('createCompletion test completed successfully!');
+    clearLlmClient();
+}
+
+const createCompletionStreamTest = async () => {
+    console.log('Starting createCompletionStream test...');
+    await initializeLlmClient();
+    let request:ChatRequest = {
+        messages: [
+            {
+                role: Role.USER,
+                content: 'Hello, how are you today?'
+            }
+        ]
+    };
+
+
+    request.model = 'qwen3:8b';
+    request.stream = true;
+
+    const listener = (completions: Array<ChatCompletion>) => {
+        let streamedResponse = '';
+        completions.forEach((completion) => {
+          if (completion.choices && completion.choices.length > 0) {
+            streamedResponse += (completion.choices[0] as CompletionChunk).delta.content;
+          }
+        });
+        console.log('Streamed response:', streamedResponse);
+    };
+
+    await createCompletion(request, listener)
+
+    console.log('createCompletionStream test completed successfully!');
     clearLlmClient();
 }
 
@@ -213,7 +246,7 @@ const createCompletionTest = async () => {
         await getModelTest();
         await setModelTest();
         await createCompletionTest();
-
+        await createCompletionStreamTest();
         console.log("🎉 All integration tests passed");
     } catch (err) {
         console.error("❌ Integration tests failed:", err);

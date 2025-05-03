@@ -9,23 +9,36 @@ import { Usage } from "@/models/response/usage";
 
 interface ChatCompletion {
     id: string;
-    object: ResponseObject.COMPLETION;
+    object: ResponseObject.COMPLETION | ResponseObject.CHAT_COMPLETION_CHUNK;
     created: number;
     model: string;
     system_fingerprint?: string;
-    choices: Array<Choice>;
+    choices: Array<CompletionChoice>;
     usage: Usage;
     service_teir?: ServiceTeir | null;
 };
 
-interface Choice {
+type CompletionChoice = 
+    | CompletionMessage
+    | CompletionChunk;
+
+interface CompletionMessage {
     index: number;
     message: Message;
     finished_reason: FinishReason; 
     logprobs?: LogProbs | null;
 };
 
+interface CompletionChunk {
+    index: number;
+    delta: Message;
+    finished_reason: FinishReason; 
+    logprobs?: LogProbs | null;
+};
+
 export {
     ChatCompletion,
-    Choice
+    CompletionChoice,
+    CompletionMessage,
+    CompletionChunk
 };
