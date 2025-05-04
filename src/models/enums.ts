@@ -97,7 +97,8 @@ enum ResponseObject {
     LIST = 'list',
     MODEL = 'model',
     COMPLETION = 'completion',
-    FUNCTION='function'
+    FUNCTION='function',
+    CHAT_COMPLETION_CHUNK = 'chat.completion.chunk'
 };
 
 enum FinishReason {

@@ -4,18 +4,22 @@ import {
     OpenAIConfiguration,
     LlmProvider
 } from "@/configuration/llm_configurations";
+import { sseDecoder } from "@/utils/decoder";
 import { Model, Models } from "@/models/response/models";
 import { ChatRequest } from "@/models/request/chat_request";
 import { ChatCompletion } from "@/models/response/chat_completion";
 import { GenerateImageRequest } from "@/models/request/generate_image_request";
 import { ImageResponse } from "@/models/response/image_response";
+import { ServerSentEvent } from "@/models/server_sent_event";
+
+type FetchImplementation = typeof fetch;
 
 class OpenAIClient implements LlmClient {
     private model: Model | null = null;
     private models: Model[] | null = null;
     private provider: LlmProvider;
-    private apiKey: string;
-    private baseUrl: string = 'https://api.openai.com';
+    protected apiKey: string;
+    protected baseUrl: string = 'https://api.openai.com';
 
     constructor( 
         configuration: OllamaConfiguration | OpenAIConfiguration,
@@ -69,8 +73,16 @@ class OpenAIClient implements LlmClient {
     setModel(model: Model): void {  
         this.model = model;
     }
+    
+    async createCompletion(request: ChatRequest, chatListener?: (completions: Array<ChatCompletion>) => void): Promise<ChatCompletion> {
+        if (request.stream) {
+            return this.createCompletionStreaming(request, chatListener);
+        } else {
+            return this.createCompletionNonStreaming(request);
+        }
+    }
 
-    async createCompletion(request: ChatRequest): Promise<ChatCompletion> {
+    async createCompletionNonStreaming(request: ChatRequest): Promise<ChatCompletion> {
         try {
             const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
                 method: 'POST',
@@ -93,6 +105,93 @@ class OpenAIClient implements LlmClient {
             throw error;
         }
     }
+
+    async createCompletionStreaming(
+        request: ChatRequest, 
+        chatListener?: (completions: Array<ChatCompletion>) => void): Promise<ChatCompletion> {
+        try {
+            const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request)
+            });
+
+            if (!response.ok) {
+                const errJson = await response.json();
+                throw new Error(`HTTP error! status: ${errJson.error.message}`);
+            }
+
+            const body = response.body as ReadableStream<Uint8Array>;
+            const reader = body.getReader();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+        
+                let chunk = new TextDecoder().decode(value);
+                const sses: Array<ServerSentEvent> = sseDecoder(chunk);
+
+                const completions = sses
+                    .filter(sse => !sse.finished)
+                    .map(sse => JSON.parse(sse.data) as ChatCompletion);
+                if (chatListener && completions.length > 0) {
+                    chatListener(completions);
+                }
+            }
+            return {} as ChatCompletion; // Return an empty object or handle the completion as needed 
+        } catch (error) {
+            console.error('Error streaming completion:', error);
+            throw error;
+        }
+    }
+
+    async reactNativeStreamingCompletion(
+        request: ChatRequest, 
+        customFetch: FetchImplementation,
+        chatListener?: (completions: Array<ChatCompletion>) => void    
+    ): Promise<ChatCompletion> {
+        try {
+            const response = await customFetch(`${this.baseUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request)
+            });
+
+            if (!response.ok) {
+                const errJson = await response.json();
+                throw new Error(`HTTP error! status: ${errJson.error.message}`);
+            }
+
+            const body = response.body as ReadableStream<Uint8Array>;
+            const reader = body.getReader();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+        
+                let chunk = new TextDecoder().decode(value);
+                const sses: Array<ServerSentEvent> = sseDecoder(chunk);
+
+                const completions = sses
+                    .filter(sse => !sse.finished)
+                    .map(sse => JSON.parse(sse.data) as ChatCompletion);
+                if (chatListener && completions.length > 0) {
+                    chatListener(completions);
+                }
+            }
+            return {} as ChatCompletion; // Return an empty object or handle the completion as needed 
+        } catch (error) {
+            console.error('Error streaming completion:', error);
+            throw error;
+        }
+    }
+
 
    /**
      * Generates an image based on the provided request.
