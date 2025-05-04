@@ -12,6 +12,8 @@ import { ChatRequest } from "@/models/request/chat_request";
 import { GenerateImageRequest } from "@/models/request/generate_image_request";
 import { ImageResponse } from "@/models/response/image_response";
 
+type FetchImplementation = typeof fetch;
+
 let llmClient: LlmClient | null = null;
 
 /**
@@ -195,6 +197,27 @@ const createCompletion = async (request: ChatRequest, chatListener?: (completion
     return llmClient.createCompletion(request, chatListener);
 };
 
+const reactNativeStreamingCompletion = async (
+    request: ChatRequest,
+    customFetch: FetchImplementation,
+    chatListener?: (completions: Array<ChatCompletion>) => void): Promise<ChatCompletion> => {
+
+    if (!llmClient) {
+        throw new Error("LLM client not initialized. Call createLlmClient first.");
+    }
+
+    // If the caller didn't supply a model, use the one already set in the client
+    if (!request.model) {
+        const current = getModel();
+        if (!current) {
+        throw new Error("No model set. Please set the model before calling createCompletion.");
+        }
+        request.model = current.id;
+    }
+
+    return llmClient.reactNativeStreamingCompletion(request, customFetch, chatListener);
+};
+
 /**
  * Generates an image based on the provided request.
  * Note: This method currently supports only the OPENAI provider.
@@ -227,5 +250,6 @@ export {
     getModel,
     setModel,
     createCompletion,
+    reactNativeStreamingCompletion,
     generateImage
 };
