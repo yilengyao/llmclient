@@ -2,7 +2,7 @@ import { ImageUsage } from '@/models/response/usage';
 
 interface ImageResponse {
     created: number;
-    data?: Array<Image>;
+    data: Array<Image>;
     usage?: ImageUsage;
 }
 
