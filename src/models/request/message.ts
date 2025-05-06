@@ -12,7 +12,7 @@ type Message =
     | UserMessage 
     | AssistantMessage 
     | ToolMessage
-    | BotMessage;
+    | FunctionMessage;
 
 interface DeveloperMessage {
     content: string | Array<TextContent>;
@@ -46,8 +46,8 @@ interface ToolMessage {
     tool_call_id: string;
 };
 
-interface BotMessage {
-    role: Role.BOT;
+interface FunctionMessage {
+    role: Role.FUNCTION;
     content: string | Array<TextContent>;
     name?: string;
 };
