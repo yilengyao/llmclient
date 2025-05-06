@@ -4,7 +4,7 @@ enum Role {
     USER = 'user',
     ASSISTANT = 'assistant',
     TOOL = 'tool',
-    BOT = 'bot',
+    FUNCTION = 'function'
 };
 
 enum ReasoningEffort {
