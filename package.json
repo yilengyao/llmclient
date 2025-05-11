@@ -1,6 +1,13 @@
 {
   "name": "@innobridge/llmclient",
-  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yilengyao/llmclient.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "version": "0.0.1",
   "description": "A TypeScript library for LLM clients",
   "author": "yilengyao <innobridgetechnology@gmail.com>",
   "license": "InnoBridge",
