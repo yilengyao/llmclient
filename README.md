@@ -47,6 +47,34 @@ The project has the following files and directories:
 - `npm run verify`: Run typechecks + tests + build. Suitable when developing and in CI environments to ensure all checks are valid
 - `npm run clean`: Deletes the `dist` directory
 
+# Message Cache
+Is implemented by passing in `expo-sqllite` from react native;
+
+Initialize Message Cache
+```
+import { messageCache, databaseClient } from "@innobridge/llmclient";
+import * as SQLite from 'expo-sqlite';
+
+const { ExpoSQLiteAdapter } = databaseClient;
+const { initializeMessageCache } = messageCache;
+
+...
+
+const db = await SQLite.openDatabaseAsync('chats.db');
+const dbAdapter = new ExpoSQLiteAdapter(db);
+await initializeMessageCache(dbAdapter);
+```
+
+usage
+```
+import { messageCache } from "@innobridge/llmclient";
+const { getChats, renameChat, deleteChat } = messageCache;
+...
+const result = (await getChats()) as Chat[];
+await renameChat(chatId, newName);
+await deleteChat(chatId);
+```
+
 # Local development
 In current repo(llmclient) run
 ```
