@@ -63,11 +63,11 @@ const getChats = async <T>(): Promise<T[]> => {
     return await cacheClient?.getChats<T>() as T[];
 };
 
-const addChat = async (title: string): Promise<SQLiteRunResult> => {
+const addChat = async (title: string, userId?: string): Promise<SQLiteRunResult> => {
     if (!isCacheClientSet()) {
         throw new Error("Message cache not initialized. Call initializeMessageCache first.");
     }
-    return await cacheClient?.addChat(title) as SQLiteRunResult;
+    return await cacheClient?.addChat(title, userId) as SQLiteRunResult;
 };
 
 const getMessages = async <T>(chatId: number): Promise<T[]> => {
@@ -87,7 +87,17 @@ const addMessage = async (
     if (!isCacheClientSet()) {
         throw new Error("Message cache not initialized. Call initializeMessageCache first.");
     }
-    return await cacheClient?.addMessage(chatId, content, role, imageUrl, prompt) as SQLiteRunResult;
+    try {
+        await cacheClient?.beginTransaction();
+        const result = await cacheClient?.addMessage(chatId, content, role, imageUrl, prompt) as SQLiteRunResult;
+        await cacheClient?.updateTableTimestamp("chats", chatId);
+        await cacheClient?.commitTransaction();
+        return result;
+    } catch (error: any) {
+        await cacheClient?.rollbackTransaction();
+        console.error("Error adding message:", error.message);
+        throw error;
+    }
 };
 
 const deleteChat = async (chatId: number): Promise<SQLiteRunResult> => {
@@ -101,7 +111,24 @@ const renameChat = async (chatId: number, title: string): Promise<SQLiteRunResul
     if (!isCacheClientSet()) {
         throw new Error("Message cache not initialized. Call initializeMessageCache first.");
     }
-    return await cacheClient?.renameChat(chatId, title) as SQLiteRunResult;
+    try {
+        await cacheClient?.beginTransaction();   
+        const result = await cacheClient?.renameChat(chatId, title) as SQLiteRunResult;
+        await cacheClient?.updateTableTimestamp("chats", chatId);
+        await cacheClient?.commitTransaction();
+        return result;
+    } catch (error: any) {
+        await cacheClient?.rollbackTransaction();
+        console.error("Error renaming chat:", error.message);
+        throw error;
+    }   
+};
+
+const clearChat = async (): Promise<void> => {
+    if (!isCacheClientSet()) {
+        throw new Error("Message cache not initialized. Call initializeMessageCache first.");
+    }
+    return await cacheClient?.clearChat();
 };
 
 export {
@@ -117,5 +144,6 @@ export {
     getMessages,
     addMessage,
     deleteChat,
-    renameChat
+    renameChat,
+    clearChat,
 };

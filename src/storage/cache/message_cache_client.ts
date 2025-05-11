@@ -8,7 +8,7 @@ interface MessageCacheClient {
     commitTransaction(): Promise<void>;
     rollbackTransaction(): Promise<void>;
     initializeCache(): Promise<void>;
-    addChat(title: string): Promise<SQLiteRunResult>;
+    addChat(title: string, userId?: string): Promise<SQLiteRunResult>;
     getChats<T>(): Promise<T[]>;
     getMessages<T>(chatId: number): Promise<T[]>;
     addMessage(
@@ -20,6 +20,8 @@ interface MessageCacheClient {
     ): Promise<SQLiteRunResult>;
     deleteChat(chatId: number): Promise<SQLiteRunResult>;
     renameChat(chatId: number, title: string): Promise<SQLiteRunResult>;
+    clearChat(): Promise<void>;
+    updateTableTimestamp(tableName: string, table: number): Promise<SQLiteRunResult>;
 };
 
 export type {

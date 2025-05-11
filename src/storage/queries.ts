@@ -7,12 +7,14 @@ enum Transaction {
 const CREATE_CHATS_TABLE_QUERY = 
     `CREATE TABLE IF NOT EXISTS chats (
         id INTEGER PRIMARY KEY NOT NULL,
+        userId INTEGER,
         title TEXT NOT NULL,
-        created_at INTEGER DEFAULT (unixepoch())
+        created_at INTEGER DEFAULT (unixepoch()),
+        updated_at INTEGER DEFAULT (unixepoch())
     );`;
 
 const CREATE_MESSAGES_TABLE_QUERY =
-    `CREATE TABLE messages (
+    `CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY NOT NULL,
         chat_id INTEGER NOT NULL,
         content TEXT NOT NULL,
@@ -23,8 +25,9 @@ const CREATE_MESSAGES_TABLE_QUERY =
         FOREIGN KEY (chat_id) REFERENCES chats (id) ON DELETE CASCADE
     );`;
 
-const ADD_CHAT_QUERY =
-    'INSERT INTO chats (title) VALUES (?)';
+const ADD_CHAT_QUERY = 
+    'INSERT INTO chats (title, userId) VALUES (?, ?)';
+
 
 const GET_CHATS_QUERY = 
     `SELECT c.*, 
@@ -45,6 +48,13 @@ const DELETE_CHAT_QUERY =
 const RENAME_CHAT_QUERY =
     'UPDATE chats SET title = ? WHERE id = ?';
 
+const CLEAR_CHAT_QUERY =
+    `DELETE FROM chats;
+      -- Messages will be deleted automatically via CASCADE constraint`;
+
+const updateTableTimestampQuery = (tableName: string): string => 
+    `UPDATE ${tableName} SET updated_at = unixepoch() WHERE id = ?`;
+
 export {
     Transaction,
     CREATE_CHATS_TABLE_QUERY,
@@ -54,5 +64,7 @@ export {
     GET_MESSAGES_QUERY,
     ADD_MESSAGE_QUERY,
     DELETE_CHAT_QUERY,
-    RENAME_CHAT_QUERY
+    RENAME_CHAT_QUERY,
+    CLEAR_CHAT_QUERY,
+    updateTableTimestampQuery
 };

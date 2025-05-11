@@ -10,7 +10,8 @@ import {
     GET_MESSAGES_QUERY,
     ADD_MESSAGE_QUERY,
     DELETE_CHAT_QUERY,
-    RENAME_CHAT_QUERY
+    RENAME_CHAT_QUERY,
+    CLEAR_CHAT_QUERY
 } from "@/storage/queries";
 
 class SqlLiteMessageCacheClient implements MessageCacheClient {
@@ -45,7 +46,7 @@ class SqlLiteMessageCacheClient implements MessageCacheClient {
     };
 
     async createChatsTable(): Promise<void> {
-        return await this.execAsync(CREATE_CHATS_TABLE_QUERY);    
+        return await this.execAsync(CREATE_CHATS_TABLE_QUERY);
     };
 
     async createMessagesTable(): Promise<void> {
@@ -93,9 +94,9 @@ class SqlLiteMessageCacheClient implements MessageCacheClient {
         await this.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
     }
 
-    async addChat(title: string): Promise<SQLiteRunResult> {
+    async addChat(title: string, userId?: string): Promise<SQLiteRunResult> {
         try {
-            return await this.runAsync(ADD_CHAT_QUERY, [title]);
+            return await this.runAsync(ADD_CHAT_QUERY, [title, userId || null]);
         } catch (error) {
             console.error("Error adding chat:", error);
             throw error;
@@ -151,7 +152,25 @@ class SqlLiteMessageCacheClient implements MessageCacheClient {
             throw error;
         }
     }
-}
+
+    async clearChat(): Promise<void> {
+        try {
+            return await this.execAsync(CLEAR_CHAT_QUERY);
+        } catch (error) {
+            console.error("Error clearing chat:", error);
+            throw error;
+        }
+    }
+
+    async updateTableTimestamp(tableName: string, id: number): Promise<SQLiteRunResult> {
+        try {
+            return await this.runAsync(`UPDATE ${tableName} SET updated_at = unixepoch() WHERE id = ?`, [id]);
+        } catch (error) {
+            console.error("Error updating table timestamp:", error);
+            throw error;
+        }
+    }
+};
 
 export {
     SqlLiteMessageCacheClient
