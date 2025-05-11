@@ -5,7 +5,8 @@
     "url": "https://github.com/yilengyao/llmclient.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "version": "0.0.1",
   "description": "A TypeScript library for LLM clients",
