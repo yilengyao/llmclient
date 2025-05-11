@@ -1,5 +1,6 @@
 import * as configuration from '@/configuration/llm_configurations'
 import * as api from '@/api/llm';
+import * as messageCache from '@/api/message_cache';
 import * as model from '@/models/response/models';
 import * as chatRequest from '@/models/request/chat_request';
 import * as content from '@/models/request/content';
@@ -14,10 +15,13 @@ import * as usage from '@/models/response/usage';
 import * as enums from '@/models/enums';
 import * as generateImageRequest from '@/models/request/generate_image_request';
 import * as imageResponse from '@/models/response/image_response';
+import * as sqllite from '@/models/sqllite';
+import * as databaseClient from '@/storage/cache/database_client';
 
 export { 
     configuration,
     api,
+    messageCache,
     model,
     chatRequest,
     content,
@@ -31,5 +35,7 @@ export {
     usage,
     enums,
     generateImageRequest,
-    imageResponse
+    imageResponse,
+    sqllite,
+    databaseClient
 };
